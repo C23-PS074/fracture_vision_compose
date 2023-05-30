@@ -1,24 +1,22 @@
 package com.bangkit.fracturevision.screen.scan
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -36,32 +34,41 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.bangkit.fracturevision.R
-import com.bangkit.fracturevision.utils.uriToFile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    photoUri: Uri?,
+    navigateToCameraX: () -> Unit
 ) {
     var imageUri by rememberSaveable {
-        mutableStateOf<Uri?>(null)
+        mutableStateOf(photoUri)
     }
     val context = LocalContext.current
-    val bitmap = rememberSaveable{
-        mutableStateOf<Bitmap?>(null)
-    }
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             imageUri = uri
     }
+    val cameraX = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) {
+        isGranted ->
+            if (isGranted) {
+                navigateToCameraX()
+            } else {
+                Toast.makeText(context, "Need Permission", Toast.LENGTH_SHORT).show()
+            }
+    }
+    val permission = Manifest.permission.CAMERA
     Scaffold(
         topBar = {
             TopAppBar(
@@ -105,7 +112,14 @@ fun ScanScreen(
             ) {
                 Button(
                     modifier = modifier.weight(1f),
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                        checkRequestCameraPermission(
+                            context,
+                            permission,
+                            cameraX,
+                            navigateToCameraX
+                        )
+                    }
                 ) {
                     Text(text = "Take Photo")
                 }
@@ -122,14 +136,26 @@ fun ScanScreen(
             Button(
                 modifier = modifier.fillMaxWidth(),
                 onClick = {
-                    if (imageUri != null) {
-                        Log.d("URI", uriToFile(imageUri!!, context).toString())
-                    }
+                    Toast.makeText(context, "$imageUri", Toast.LENGTH_SHORT).show()
                 }
             ) {
                 Text(text = "Get Result")
             }
         }
+    }
+}
+
+fun checkRequestCameraPermission(
+    context: Context,
+    permission: String,
+    cameraX: ManagedActivityResultLauncher<String, Boolean>,
+    navigateToCameraX: () -> Unit
+) {
+    val permissionCheckResult = ContextCompat.checkSelfPermission(context, permission)
+    if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+        navigateToCameraX()
+    } else {
+        cameraX.launch(permission)
     }
 }
 
