@@ -22,7 +22,6 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     appViewModel: AppViewModel,
     navigateToLogin : () -> Unit,
-    navigateToScan : () -> Unit
 ) {
     val user by appViewModel.getUser().observeAsState()
     if(user?.isLogin == false){
@@ -31,20 +30,16 @@ fun HomeScreen(
         }
     } else {
         HomeContent(
+            modifier = modifier,
             user = user,
-            appViewModel = appViewModel,
-            navigateToScan = navigateToScan
         )
     }
-
 }
 
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
     user: User?,
-    appViewModel: AppViewModel,
-    navigateToScan : () -> Unit
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -58,16 +53,6 @@ fun HomeContent(
                     fontWeight = FontWeight.ExtraBold,
                 ),
             )
-            Button(onClick = {
-                navigateToScan()
-            }) {
-                Text(text = "Scan")
-            }
-            Button(onClick = {
-                appViewModel.logout()
-            }) {
-                Text(text = "Logout")
-            }
             Text(
                 text = user?.isLogin.toString()
             )

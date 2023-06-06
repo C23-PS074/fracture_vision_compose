@@ -33,7 +33,8 @@ class MainActivity : ComponentActivity() {
                     FractureVisionApp(
                         appViewModel = viewModel(
                             factory = AppViewModelFactory(UserPreference.getInstance(dataStore))
-                        )
+                        ),
+                        predictViewModel = viewModel()
                     )
                 }
             }

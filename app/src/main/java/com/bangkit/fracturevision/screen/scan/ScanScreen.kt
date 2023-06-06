@@ -3,35 +3,44 @@ package com.bangkit.fracturevision.screen.scan
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -41,14 +50,22 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bangkit.fracturevision.AppViewModel
+import com.bangkit.fracturevision.PredictViewModel
 import com.bangkit.fracturevision.R
+import com.bangkit.fracturevision.ScanApiStatus
+import com.bangkit.fracturevision.component.LoadingCircular
+import com.bangkit.fracturevision.utils.uriToFile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanScreen(
     modifier: Modifier = Modifier,
+    appViewModel: AppViewModel,
+    predictViewModel: PredictViewModel,
     photoUri: Uri?,
-    navigateToCameraX: () -> Unit
+    navigateToCameraX: () -> Unit,
+    navigateToResult: () -> Unit
 ) {
     var imageUri by rememberSaveable {
         mutableStateOf(photoUri)
@@ -69,6 +86,7 @@ fun ScanScreen(
             }
     }
     val permission = Manifest.permission.CAMERA
+    val isLoading by predictViewModel.status.observeAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -110,8 +128,17 @@ fun ScanScreen(
                     .padding(vertical = 40.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Button(
-                    modifier = modifier.weight(1f),
+                OutlinedButton(
+                    modifier = modifier
+                        .weight(1f)
+                        .heightIn(min = 48.dp)
+                    ,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
                     onClick = {
                         checkRequestCameraPermission(
                             context,
@@ -121,25 +148,54 @@ fun ScanScreen(
                         )
                     }
                 ) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = "camera")
+                    Spacer(modifier = modifier.padding(horizontal = 5.dp))
                     Text(text = "Take Photo")
                 }
-                Button(
-                    modifier = modifier.weight(1f),
+                OutlinedButton(
+                    modifier = modifier
+                        .weight(1f)
+                        .heightIn(min = 48.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
                     onClick = {
                         imagePicker.launch("image/*")
                     }
                 ) {
+                    Icon(imageVector = Icons.Default.List, contentDescription = "camera")
+                    Spacer(modifier = modifier.padding(horizontal = 5.dp))
                     Text(text = "Gallery")
                 }
             }
 
             Button(
-                modifier = modifier.fillMaxWidth(),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    Toast.makeText(context, "$imageUri", Toast.LENGTH_SHORT).show()
+                    if (imageUri != null) {
+                        val imgFile = uriToFile(imageUri!!, context)
+                        predictViewModel.uploadImage(
+                            file = imgFile,
+                            context = context,
+                            navigateToResult = navigateToResult
+                        )
+                    }
                 }
             ) {
                 Text(text = "Get Result")
+            }
+            if (isLoading == ScanApiStatus.LOADING) {
+                LoadingCircular(
+                    modifier = modifier
+                        .padding(vertical = 16.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
             }
         }
     }
