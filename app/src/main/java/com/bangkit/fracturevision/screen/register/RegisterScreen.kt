@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.fracturevision.component.LoadingCircular
 import com.bangkit.fracturevision.component.TextInput
-import com.bangkit.fracturevision.screen.login.LoginApiStatus
 
 @Composable
 fun RegisterScreen(

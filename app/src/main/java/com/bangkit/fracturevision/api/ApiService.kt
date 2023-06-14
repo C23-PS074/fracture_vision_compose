@@ -1,11 +1,9 @@
 package com.bangkit.fracturevision.api
 
-import com.bangkit.fracturevision.model.LoginResponse
 import com.bangkit.fracturevision.model.PredictResponse
 import com.bangkit.fracturevision.model.RecordResponse
 import com.bangkit.fracturevision.model.RegisterResponse
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

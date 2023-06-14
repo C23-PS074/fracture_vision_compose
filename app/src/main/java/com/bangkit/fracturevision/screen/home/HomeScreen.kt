@@ -1,12 +1,14 @@
 package com.bangkit.fracturevision.screen.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -88,7 +90,20 @@ fun HomeScreen(
                             .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "Failed To Load Data.")
+                        Column(
+                            modifier = modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Text(text = "Failed To Load Data.")
+                            Button(
+                                onClick = {
+                                    homeViewModel.getRecord(user?.id)
+                                }
+                            ) {
+                                Text(text = "Refresh")
+                            }
+                        }
                     }
                 }
 

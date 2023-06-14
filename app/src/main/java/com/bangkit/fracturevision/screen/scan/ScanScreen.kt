@@ -23,9 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -154,7 +151,11 @@ fun ScanScreen(
                         )
                     }
                 ) {
-                    Icon(imageVector = Icons.Default.Share, contentDescription = "camera")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_camera),
+                        contentDescription = "camera",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(modifier = modifier.padding(horizontal = 5.dp))
                     Text(text = "Take Photo")
                 }
@@ -172,7 +173,11 @@ fun ScanScreen(
                         imagePicker.launch("image/*")
                     }
                 ) {
-                    Icon(imageVector = Icons.Default.List, contentDescription = "camera")
+                    Icon(
+                        painterResource(id = R.drawable.ic_image),
+                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = "gallery"
+                    )
                     Spacer(modifier = modifier.padding(horizontal = 5.dp))
                     Text(text = "Gallery")
                 }

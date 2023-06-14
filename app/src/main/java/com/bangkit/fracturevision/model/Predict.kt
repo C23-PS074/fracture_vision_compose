@@ -1,9 +1,5 @@
 package com.bangkit.fracturevision.model
 
-import android.os.Bundle
-import androidx.navigation.NavType
-import com.google.gson.Gson
-
 data class PredictResponse(
     val image_path: String,
     val prediction: String

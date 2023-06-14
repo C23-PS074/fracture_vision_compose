@@ -1,11 +1,18 @@
 package com.bangkit.fracturevision.screen.profile
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -23,14 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.fracturevision.AppViewModel
 import com.bangkit.fracturevision.component.LoadingCircular
+import com.bangkit.fracturevision.component.ProfileItemInfo
 import com.bangkit.fracturevision.model.User
-import com.bangkit.fracturevision.screen.home.HomeContent
-import com.bangkit.fracturevision.ui.theme.FractureVisionTheme
 
 @Composable
 fun ProfileScreen(
@@ -83,24 +88,60 @@ fun ProfileContent(
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ){
-            Column(horizontalAlignment = Alignment.CenterHorizontally){
+            Column(
+                modifier = modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp)
+            ){
                 Text(
-                    text = "Profile Screen",
+                    modifier = modifier.padding(bottom = 20.dp),
+                    text = "User Profile",
                     fontSize = 24.sp,
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.primary
                     ),
                 )
-                Text(text = user?.username.toString())
-                Text(text = user?.fullname.toString())
-                Text(text = user?.phone.toString())
-                Text(text = user?.address.toString())
-                Text(text = user?.id.toString())
-
-                Button(onClick = {
-                    isLoading = true
-                    appViewModel.logout()
-                }) {
+                Card (
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    ProfileItemInfo(
+                        itemName = "Fullname",
+                        value = user?.fullname.toString(),
+                        isHaveDivider = true
+                    )
+                    ProfileItemInfo(
+                        itemName = "Username",
+                        value = user?.username.toString(),
+                        isHaveDivider = true
+                    )
+                    ProfileItemInfo(
+                        itemName = "Phone",
+                        value = user?.phone.toString(),
+                        isHaveDivider = true
+                    )
+                    ProfileItemInfo(
+                        itemName = "Address",
+                        value = user?.address.toString(),
+                        isHaveDivider = false
+                    )
+                }
+                Button(
+                    modifier = modifier
+                        .padding(vertical = 40.dp)
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDE3969)),
+                    onClick = {
+                        isLoading = true
+                        appViewModel.logout()
+                    }
+                ) {
                     Text(text = "Logout")
                 }
                 if (isLoading) {

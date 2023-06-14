@@ -13,18 +13,19 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.bangkit.fracturevision.R
 import com.bangkit.fracturevision.utils.createFile
 import java.lang.Exception
 import java.util.concurrent.Executor
@@ -88,8 +89,9 @@ fun CameraXScreen(
             },
             content = {
                 Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Take Picture"
+                    painter = painterResource(id = R.drawable.ic_camera_48),
+                    contentDescription = "Take Picture",
+                    tint = Color.White
                 )
             }
         )
