@@ -3,6 +3,7 @@ package com.bangkit.fracturevision.screen.result
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,11 +24,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.bangkit.fracturevision.PredictViewModel
 import com.bangkit.fracturevision.R
+import com.bangkit.fracturevision.ui.theme.FractureVisionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,9 +41,6 @@ fun ResultScreen(
     modifier: Modifier = Modifier,
     predictViewModel: PredictViewModel
 ) {
-    val imageUri by rememberSaveable {
-        mutableStateOf(null)
-    }
     val data by predictViewModel.data.observeAsState()
     Scaffold(
         topBar = {
@@ -54,32 +57,61 @@ fun ResultScreen(
                 colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
             )
         }
-    ){
-            innerPadding ->
+    ){ innerPadding ->
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(24.dp)
+                .padding(24.dp),
         ) {
             AsyncImage(
                 modifier = modifier
                     .fillMaxSize()
                     .height(320.dp),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUri)
+                    .data(data?.image_path)
                     .build(),
                 contentDescription = "Image",
                 placeholder = painterResource(id = R.drawable.ic_image),
                 error = painterResource(id = R.drawable.ic_image),
             )
-            Text(text = "Result")
+            Text(
+                modifier = modifier.fillMaxWidth(),
+                text = "Result",
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
             if(data != null) {
-                Text(text = data!!.prediction)
+                Text(
+                    modifier = modifier.fillMaxWidth(),
+                    text = data!!.prediction,
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
             } else {
-                Text(text = "Failed to get result.")
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    text = "Failed to get result.",
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
+    }
+}
+
+@Composable
+@Preview
+fun ResultScreenPreview() {
+    FractureVisionTheme {
+        ResultScreen(
+            predictViewModel = viewModel()
+        )
     }
 }

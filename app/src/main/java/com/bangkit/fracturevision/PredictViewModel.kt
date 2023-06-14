@@ -7,9 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bangkit.fracturevision.api.ApiConfig
 import com.bangkit.fracturevision.model.PredictResponse
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,7 +26,7 @@ class PredictViewModel : ViewModel() {
     private val _status = MutableLiveData<ScanApiStatus>()
     val status : LiveData<ScanApiStatus> = _status
 
-    fun uploadImage(file: File, context: Context, navigateToResult: () -> Unit) {
+    fun uploadImage(id: Int, file: File, context: Context, navigateToResult: () -> Unit) {
         _status.value = ScanApiStatus.LOADING
         val imageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
@@ -33,6 +35,7 @@ class PredictViewModel : ViewModel() {
             imageFile
         )
         val client = ApiConfig.getApiService().predict(
+            id,
             imageMultipart
         )
         client.enqueue(object : Callback<PredictResponse> {

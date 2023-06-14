@@ -33,6 +33,7 @@ import com.bangkit.fracturevision.screen.home.HomeScreen
 import com.bangkit.fracturevision.screen.login.LoginScreen
 import com.bangkit.fracturevision.screen.login.LoginViewModelFactory
 import com.bangkit.fracturevision.screen.profile.ProfileScreen
+import com.bangkit.fracturevision.screen.register.RegisterScreen
 import com.bangkit.fracturevision.screen.result.ResultScreen
 import com.bangkit.fracturevision.screen.scan.ScanScreen
 
@@ -46,10 +47,6 @@ fun FractureVisionApp(
 ) {
     val photoUriFromCameraX = remember {
         mutableStateOf<Uri?>(null)
-    }
-
-    var showBottomNavBar by rememberSaveable {
-        mutableStateOf(false)
     }
     Scaffold(
         modifier = modifier,
@@ -86,6 +83,22 @@ fun FractureVisionApp(
                     navigateToHome = {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
+                    navigateToRegister = {
+                        navController.navigate(Screen.Register.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable(
+                Screen.Register.route
+            ) {
+                RegisterScreen(
+                    navigateToLogin = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
                         }
                     }
                 )

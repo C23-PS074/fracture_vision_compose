@@ -1,4 +1,4 @@
-package com.bangkit.fracturevision.screen.login
+package com.bangkit.fracturevision.screen.register
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -6,18 +6,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -26,61 +28,43 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bangkit.fracturevision.AppViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.fracturevision.component.LoadingCircular
 import com.bangkit.fracturevision.component.TextInput
-import com.bangkit.fracturevision.screen.register.RegisterApiStatus
+import com.bangkit.fracturevision.screen.login.LoginApiStatus
 
 @Composable
-fun LoginScreen(
-    modifier: Modifier = Modifier,
-    appViewModel: AppViewModel,
-    loginViewModel: LoginViewModel,
-    navigateToHome : () -> Unit,
-    navigateToRegister: () -> Unit
-) {
-    val user by appViewModel.getUser().observeAsState()
-    if(user?.isLogin == true) {
-        LaunchedEffect(user) {
-            navigateToHome()
-        }
-    } else {
-        LoginContent(
-            loginViewModel = loginViewModel,
-            navigateToHome = navigateToHome,
-            navigateToRegister = navigateToRegister
-        )
-    }
-}
-
-@Composable
-fun LoginContent(
-    modifier: Modifier = Modifier,
-    loginViewModel: LoginViewModel,
-    navigateToHome : () -> Unit,
-    navigateToRegister: () -> Unit
+fun RegisterScreen(
+    modifier : Modifier = Modifier,
+    registerViewModel: RegisterViewModel = viewModel(),
+    navigateToLogin: () -> Unit
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    val isLoading by loginViewModel.status.observeAsState()
+    var fullname by rememberSaveable { mutableStateOf("") }
+    var phone by rememberSaveable { mutableStateOf("") }
+    var address by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
+    val isLoading by registerViewModel.status.observeAsState()
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ){
-        Column(horizontalAlignment = Alignment.CenterHorizontally){
+        Column(
+            modifier = modifier
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
             Text(
-                text = "Login",
+                text = "Sign Up",
                 fontSize = 24.sp,
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.ExtraBold,
@@ -109,6 +93,40 @@ fun LoginContent(
                 keyboardType = KeyboardType.Password,
                 placeholder = "Password"
             )
+            TextInput(
+                modifier = modifier.clip(
+                    RoundedCornerShape(8.dp)
+                ),
+                value = fullname,
+                onValueChange = {
+                    fullname = it
+                },
+                icon = Icons.Default.Info,
+                placeholder = "Fullname"
+            )
+            TextInput(
+                modifier = modifier.clip(
+                    RoundedCornerShape(8.dp)
+                ),
+                value = phone,
+                icon = Icons.Default.Phone,
+                onValueChange = {
+                    phone = it
+                },
+                keyboardType = KeyboardType.Number,
+                placeholder = "Phone Number"
+            )
+            TextInput(
+                modifier = modifier.clip(
+                    RoundedCornerShape(8.dp)
+                ),
+                value = address,
+                onValueChange = {
+                    address = it
+                },
+                icon = Icons.Default.LocationOn,
+                placeholder = "Address"
+            )
             Button(
                 modifier = modifier
                     .fillMaxWidth()
@@ -116,23 +134,31 @@ fun LoginContent(
                     .height(48.dp),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    loginViewModel.loginApi(username, password, context, navigateToHome)
+                    registerViewModel.registerApi(
+                        username,
+                        password,
+                        fullname,
+                        phone,
+                        address,
+                        context,
+                        navigateToLogin
+                    )
                 },
-                enabled = isLoading != LoginApiStatus.LOADING
+                enabled = isLoading != RegisterApiStatus.LOADING
             ) {
                 Text(
-                    text = "Login",
+                    text = "Register",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.ExtraBold,
                     ),
                 )
             }
             ClickableText(
-                text = AnnotatedString("Don't have account? Register")
+                text = AnnotatedString("Already have account? Login")
             ) {
-                navigateToRegister()
+                navigateToLogin()
             }
-            if (isLoading == LoginApiStatus.LOADING) {
+            if (isLoading == RegisterApiStatus.LOADING) {
                 LoadingCircular()
             }
         }

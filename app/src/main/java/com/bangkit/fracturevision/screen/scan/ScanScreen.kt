@@ -3,6 +3,8 @@ package com.bangkit.fracturevision.screen.scan
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -56,6 +58,9 @@ import com.bangkit.fracturevision.R
 import com.bangkit.fracturevision.ScanApiStatus
 import com.bangkit.fracturevision.component.LoadingCircular
 import com.bangkit.fracturevision.utils.uriToFile
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +72,7 @@ fun ScanScreen(
     navigateToCameraX: () -> Unit,
     navigateToResult: () -> Unit
 ) {
+    val user by appViewModel.getUser().observeAsState()
     var imageUri by rememberSaveable {
         mutableStateOf(photoUri)
     }
@@ -178,13 +184,17 @@ fun ScanScreen(
                     .height(48.dp),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    if (imageUri != null) {
-                        val imgFile = uriToFile(imageUri!!, context)
-                        predictViewModel.uploadImage(
-                            file = imgFile,
-                            context = context,
-                            navigateToResult = navigateToResult
-                        )
+                    if (user != null) {
+                        if (imageUri != null) {
+                            val imgFile = uriToFile(imageUri!!, context)
+                            val compressedFile = reduceFileImage(imgFile)
+                            predictViewModel.uploadImage(
+                                id = user!!.id,
+                                file = compressedFile,
+                                context = context,
+                                navigateToResult = navigateToResult
+                            )
+                        }
                     }
                 }
             ) {
@@ -213,5 +223,20 @@ fun checkRequestCameraPermission(
     } else {
         cameraX.launch(permission)
     }
+}
+
+private fun reduceFileImage(file: File) : File {
+    val bitmap = BitmapFactory.decodeFile(file.path)
+    var compressQuality = 100
+    var streamLength: Int
+    do {
+        val bmpStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream)
+        val bmpPicByteArray = bmpStream.toByteArray()
+        streamLength = bmpPicByteArray.size
+        compressQuality -= 5
+    } while (streamLength > 1000000)
+    bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, FileOutputStream(file))
+    return file
 }
 

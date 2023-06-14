@@ -5,29 +5,20 @@ import androidx.navigation.NavType
 import com.google.gson.Gson
 
 data class PredictResponse(
+    val image_path: String,
     val prediction: String
 )
 
-abstract class JsonNavType<T> : NavType<T>(isNullableAllowed = false) {
-    abstract fun fromJsonParse(value: String): T
-    abstract fun T.getJsonParse(): String
+data class RecordResponse(
+    val datarecord: List<RecordItem>,
+    val error: Boolean,
+    val message: String
+)
 
-    override fun get(bundle: Bundle, key: String): T? =
-        bundle.getString(key)?.let { parseValue(it) }
-
-    override fun parseValue(value: String): T = fromJsonParse(value)
-
-    override fun put(bundle: Bundle, key: String, value: T) {
-        bundle.putString(key, value.getJsonParse())
-    }
-}
-
-class ResultArgType : JsonNavType<PredictResponse>() {
-    override fun fromJsonParse(value: String): PredictResponse {
-        return Gson().fromJson(value, PredictResponse::class.java)
-    }
-
-    override fun PredictResponse.getJsonParse(): String {
-        return Gson().toJson(this@ResultArgType)
-    }
-}
+data class RecordItem(
+    val date: String,
+    val id: Int,
+    val image: String,
+    val result: String,
+    val time: String
+)
