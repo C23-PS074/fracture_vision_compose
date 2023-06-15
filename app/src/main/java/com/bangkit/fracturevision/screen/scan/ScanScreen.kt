@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -182,7 +183,13 @@ fun ScanScreen(
                     Text(text = "Gallery")
                 }
             }
-
+            if (isLoading == ScanApiStatus.LOADING) {
+                LoadingCircular(
+                    modifier = modifier
+                        .padding(vertical = 16.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
             Button(
                 modifier = modifier
                     .fillMaxWidth()
@@ -205,13 +212,14 @@ fun ScanScreen(
             ) {
                 Text(text = "Get Result")
             }
-            if (isLoading == ScanApiStatus.LOADING) {
-                LoadingCircular(
-                    modifier = modifier
-                        .padding(vertical = 16.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
+            Text(
+                modifier = modifier.padding(vertical = 16.dp),
+                text = "*Scanning can take 1 - 2 minutes or longer.",
+                fontSize = 11.sp,
+                color = Color(0xFFDE3969),
+                fontWeight = FontWeight.Bold
+            )
+
         }
     }
 }

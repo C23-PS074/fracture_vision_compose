@@ -82,10 +82,12 @@ fun ResultScreen(
             )
             if(data != null) {
                 Text(
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
                     text = data!!.prediction,
                     textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Medium
                 )
             } else {
